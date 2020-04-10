@@ -1,8 +1,9 @@
-function createStore (){
+//Any Library code
+function createStore (reducer){
     // create store
     // get store
     //listen for changes
-    //
+    //update state
     
 let listeners = []
 
@@ -18,17 +19,22 @@ let listeners = []
     let store
     const getStore = () => store
 
+    const dispatch = (reducer) => {
+        state = reducer(state,action)
+        listeners.forEach(listener => listener())
+    }
+
     return(
         getStore,
-        subscribe
+        subscribe,
+        dispatch
     )
 }
 
-const store = createStore()
-//-----EXAMPLE CODE----
-// when any user subscribe
-// store.subscribe(()=>{console.log("this is new state" + store.getStore())})
-// when any user un subscribe
-// const unsubscribe = store.subscribe(()=>{console.log("the store is changed! ")})
-//unsubscribe()
-//-----EXAMPLE CODE end----
+//App code
+function todos (state=[],action){
+    if(action.type==='ADD_TODO'){
+        return state.concat([action])
+    }
+    return state
+}
