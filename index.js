@@ -19,14 +19,16 @@ let listeners = []
     const getStore = () => store
 
     return(
-        getStore
+        getStore,
+        subscribe
     )
 }
 
 const store = createStore()
-
-store.subscribe(()=>{console.log("this is new state" + store.getStore())})
-
-const unsubscribe = store.subscribe(()=>{console.log("the store is changed! ")})
-
-unsubscribe()
+//-----EXAMPLE CODE----
+// when any user subscribe
+// store.subscribe(()=>{console.log("this is new state" + store.getStore())})
+// when any user un subscribe
+// const unsubscribe = store.subscribe(()=>{console.log("the store is changed! ")})
+//unsubscribe()
+//-----EXAMPLE CODE end----
