@@ -29,6 +29,11 @@ function createStore(reducer) {
 }
 
 //App code
+function generateId () {
+    return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+  }
+
+
 const ADD_TODO = 'ADD_TODO'
 const REMOVE_TODO = 'REMOVE_TODO'
 const TOGGLE_TODO = 'TOGGLE_TODO'
@@ -106,22 +111,52 @@ function removeGoalCreator(id){
 }
 
 
-store.dispatch(addTodoCreator({
-        id:0,
-        name:"Learning redux",
+// store.dispatch(addTodoCreator({
+//         id:0,
+//         name:"Learning redux",
+//         complete:false
+//     }))
+
+// store.dispatch(addTodoCreator({
+//         id:1,
+//         name:"Read a book",
+//         complete:true
+//     }))
+
+// store.dispatch(addGoalCreator({
+//        id:0,
+//         name:"sleep for 24 hour",
+//         complete:false
+//     }))
+
+// store.dispatch(removeTodoCreator(1))
+
+
+function addTodo (){
+    const input = document.getElementById('todo')
+    const name = input.value
+    input.value = ''
+
+    store.dispatch(addTodoCreator({
+        name,
+        id:generateId(),
         complete:false
     }))
+}
 
-store.dispatch(addTodoCreator({
-        id:1,
-        name:"Read a book",
-        complete:true
-    }))
+function addGoal (){
+    const input = document.getElementById('goal')
+    const name = input.value
+    input.value = ''
 
-store.dispatch(addGoalCreator({
-       id:0,
-        name:"sleep for 24 hour",
+    store.dispatch(addGoalCreator({
+        name,
+        id:generateId(),
         complete:false
     }))
+}
+document.getElementById('todoBtn')
+      .addEventListener('click', addTodo)
 
-store.dispatch(removeTodoCreator(1))
+document.getElementById('goalBtn')
+      .addEventListener('click', addGoal)
