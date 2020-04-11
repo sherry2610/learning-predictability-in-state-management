@@ -39,14 +39,17 @@ function goals(state = [], action) {
   }
 }
 //ROOT REDUCER
-function app(state = {}, action) {
-  return {
-    todos: todos(state.todos, action),
-    goals: goals(state.goals, action),
-  };
-}
+// function app(state = {}, action) {
+//   return {
+//     todos: todos(state.todos, action),
+//     goals: goals(state.goals, action),
+//   };
+// }
 
-const store = Redux.createStore(app);
+const store = Redux.createStore(Redux.combineReducers({
+    todos,
+    goals,
+}));
 
 store.subscribe(() => {
   const { todos, goals } = store.getState();
