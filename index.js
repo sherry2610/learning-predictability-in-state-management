@@ -46,10 +46,34 @@ function goals(state = [], action) {
 //   };
 // }
 
+const checker = (store) => (next) => (action) => {
+  if (
+      action.type === "ADD_TODO" &&
+      action.todo.name.toLowerCase().includes("blockchain")
+    ) {
+      return alert("Nope!this is not a good idea....");
+    } else if (
+      action.type === "ADD_GOAL" &&
+      action.goal.name.toLowerCase().includes("blockchain")
+    ) {
+      return alert("Nope!this is not a good idea....");
+    } else {
+      return next(action);
+    } 
+}
+const logger = (store) => (next) => (action) => {
+  console.group(action.type)
+  console.log("the action : ",action)
+  const result = next(action)
+  console.groupEnd()
+  return result
+}
+
+
 const store = Redux.createStore(Redux.combineReducers({
     todos,
     goals,
-}));
+}),Redux.applyMiddleware(checker, logger));
 
 store.subscribe(() => {
   const { todos, goals } = store.getState();
