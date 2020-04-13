@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/react@16.3.0-alpha.1/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
 
 
 </head>
@@ -29,6 +30,7 @@ function generateId() {
   const TOGGLE_TODO = "TOGGLE_TODO";
   const ADD_GOAL = "ADD_GOAL";
   const REMOVE_GOAL = "REMOVE_GOAL";
+  const RECEIVE_DATA = "RECEIVE_DATA";
 
 //-----------Action Creators-----------
 function addTodoCreator(todo) {
@@ -61,7 +63,13 @@ function addTodoCreator(todo) {
       id,
     };
   }
-    
+  function receiveData(goals,todos){
+    return {
+      type:"RECEIVE_DATA",
+      goals,
+      todos,
+    }
+  }
 
 
 
@@ -75,10 +83,12 @@ function todos(state = [], action) {
     case TOGGLE_TODO:
         return state.map((todo) => todo.id !== action.id ? todo :
         Object.assign({}, todo, { complete: !todo.complete }));
+    case RECEIVE_DATA:
+        return action.todos
     default:
       return state;
+    }
   }
-}
 
 function goals(state = [], action) {
   switch (action.type) {
@@ -86,8 +96,18 @@ function goals(state = [], action) {
       return state.concat([action.goal]);
     case REMOVE_GOAL:
       return state.filter((goal) => goal.id !== action.id);
+      case RECEIVE_DATA:
+        return action.goals
     default:
       return state;
+  }
+}
+function loading(state=true,action){
+  switch(action.type){
+    case RECEIVE_DATA:
+      return false
+    default:
+      return state
   }
 }
 //-------Reducers end--------------------
@@ -121,6 +141,7 @@ const logger = (store) => (next) => (action) => {
 const store = Redux.createStore(Redux.combineReducers({
     todos,
     goals,
+    loading,
 }),Redux.applyMiddleware(checker, logger));
 //---------------******-----------------
     </script>
@@ -217,9 +238,18 @@ const store = Redux.createStore(Redux.combineReducers({
         class App extends React.Component {
             componentDidMount(){
                 store.subscribe(()=>this.forceUpdate())
+                Promise.all([
+          API.fetchTodos(),
+          API.fetchGoals()
+        ]).then(([ todos, goals ]) => {
+       store.dispatch(receiveData(goals,todos))
+        })
             }
             render() {
-                const {goals, todos} = store.getState()
+                const {goals, todos, loading} = store.getState()
+                if(loading===true){
+                  return <h3>Loading...</h3>
+                }
                 return (
                     
                     <div>
