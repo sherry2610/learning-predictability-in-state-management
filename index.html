@@ -158,7 +158,7 @@ const store = Redux.createStore(Redux.combineReducers({
                         >
                             {item.name}
                         </span>
-                        <button onClick={()=>props.removeButton(item.id)}>X</button>
+                        <button onClick={()=>props.removeButton(item)}>X</button>
                     </li>
                 ))}
                 </ul> 
@@ -170,21 +170,37 @@ const store = Redux.createStore(Redux.combineReducers({
                 addItem = (e) => {
                     e.preventDefault()
                     const name = this.input.value
+                    return API.saveTodo(this.input.value)
+                        .then((todo)=>{
+                          
+                    store.dispatch(addTodoCreator(todo)
+                          )
+                          this.input.value = ''
+                      })
+                        .catch(()=>alert('there is an error . try again'))
+
                     
-                    this.input.value = ''
                     
-                    store.dispatch(addTodoCreator({
-                                name,
-                                id: generateId(),
-                                complete: false,
-                            })
-                        )
+                    
+                    
                 }
-                removeBtn = (id) => {
-                    store.dispatch(removeTodoCreator(id))
+                removeBtn = (todo) => {
+                  store.dispatch(removeTodoCreator(todo.id))
+                    return API.deleteTodo(todo.id)
+                      .catch(()=>{                        
+                        store.dispatch(addTodoCreator(todo))
+                        alert("An error occured while deleting this task")
+                      })
+                    
                 }
                 toggleItem = (id) => {
-                    store.dispatch(toggleTodoCreator(id))
+                  store.dispatch(toggleTodoCreator(id))
+                    return API.saveTodoToggle(id)
+                    .catch(()=>{
+                      store.dispatch(toggleTodoCreator(id))
+                      alert("this action cannot be completed!")
+                    })
+                    
                 }
             render() {
                 return (
@@ -207,17 +223,23 @@ const store = Redux.createStore(Redux.combineReducers({
             addItem = (e) => {
                     e.preventDefault()
                     const name = this.input.value
+                    return API.saveGoal(this.input.value)
+                        .then((goal)=>{
+                          store.dispatch(addGoalCreator(goal))
+                          this.input.value = ''
+                        }).catch(()=>alert('there is an error. try again'))
+
                     
-                    this.input.value = ''
                     
-                    store.dispatch(addGoalCreator({
-                                name,
-                                id: generateId(),
-                            })
-                        )
                 }
-                removeBtn = (id) => {
-                    store.dispatch(removeGoalCreator(id))
+                removeBtn = (goal) => {
+                  store.dispatch(removeGoalCreator(goal.id))
+                    return API.deleteGoal(goal.id)
+                      .catch(()=>{
+                        alert("An error occured while deleting this task")
+                        store.dispatch(addGoalCreator(goal))
+                      })
+
                 }
             render() {
                 return (
