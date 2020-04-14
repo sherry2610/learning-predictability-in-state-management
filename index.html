@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
+    <script src="https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js"></script>
 
 
 </head>
@@ -70,7 +71,16 @@ function addTodoCreator(todo) {
       todos,
     }
   }
-
+function handleDeleteCreator(todo){
+  return (dispatch) => {
+    dispatch(removeTodoCreator(todo.id))
+      return API.deleteTodo(todo.id)
+        .catch(()=>{                        
+          dispatch(addTodoCreator(todo))
+          alert("An error occured while deleting this task")
+        })
+  }
+}
 
 
 //-------------Reducers start----------
@@ -110,6 +120,8 @@ function loading(state=true,action){
       return state
   }
 }
+
+
 //-------Reducers end--------------------
 
 //------middleware start---------------
@@ -135,6 +147,12 @@ const logger = (store) => (next) => (action) => {
   console.groupEnd()
   return result
 }
+// const thunk = (store) => (next) => (action) => {
+//   if (typeof action === 'function'){
+//     return action(store.dispatch)
+//   }
+//   return next(action)
+// }
 //------middleware end---------------
 
 //-------------------THE STORE------------
@@ -142,7 +160,7 @@ const store = Redux.createStore(Redux.combineReducers({
     todos,
     goals,
     loading,
-}),Redux.applyMiddleware(checker, logger));
+}),Redux.applyMiddleware(ReduxThunk.default, logger, checker));
 //---------------******-----------------
     </script>
     <script type="text/babel">
@@ -178,20 +196,9 @@ const store = Redux.createStore(Redux.combineReducers({
                           this.input.value = ''
                       })
                         .catch(()=>alert('there is an error . try again'))
-
-                    
-                    
-                    
-                    
                 }
                 removeBtn = (todo) => {
-                  store.dispatch(removeTodoCreator(todo.id))
-                    return API.deleteTodo(todo.id)
-                      .catch(()=>{                        
-                        store.dispatch(addTodoCreator(todo))
-                        alert("An error occured while deleting this task")
-                      })
-                    
+                  store.dispatch(handleDeleteCreator(todo))                    
                 }
                 toggleItem = (id) => {
                   store.dispatch(toggleTodoCreator(id))
