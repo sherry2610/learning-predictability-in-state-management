@@ -81,6 +81,25 @@ function handleDeleteCreator(todo){
         })
   }
 }
+function handleAddGoal(name,cb){
+  return (dispatch)=>{
+          return API.saveGoal(name)
+              .then((goal)=>{
+                dispatch(addGoalCreator(goal))
+                cb()
+              }).catch(()=>alert('there is an error. try again'))
+      }
+}
+function handleRemoveGoal(goal){
+  return (dispatch)=>{
+      dispatch(removeGoalCreator(goal.id))
+      return API.deleteGoal(goal.id)
+        .catch(()=>{
+          alert("An error occured while deleting this task")
+          dispatch(addGoalCreator(goal))
+        })
+  }
+}
 
 
 //-------------Reducers start----------
@@ -229,24 +248,11 @@ const store = Redux.createStore(Redux.combineReducers({
         class Goals extends React.Component {
             addItem = (e) => {
                     e.preventDefault()
-                    const name = this.input.value
-                    return API.saveGoal(this.input.value)
-                        .then((goal)=>{
-                          store.dispatch(addGoalCreator(goal))
-                          this.input.value = ''
-                        }).catch(()=>alert('there is an error. try again'))
-
-                    
-                    
+                    store.dispatch(handleAddGoal(this.input.value,()=>this.input.value = ''))
                 }
                 removeBtn = (goal) => {
-                  store.dispatch(removeGoalCreator(goal.id))
-                    return API.deleteGoal(goal.id)
-                      .catch(()=>{
-                        alert("An error occured while deleting this task")
-                        store.dispatch(addGoalCreator(goal))
-                      })
-
+                  store.dispatch(handleRemoveGoal(goal))
+                  
                 }
             render() {
                 return (
